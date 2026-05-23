@@ -70,21 +70,34 @@ jobs:
 
         echo "AppID: $WECHAT_APPID"
         echo "密钥文件大小: $(wc -c < /tmp/private.key) bytes"
-        echo "密钥文件前3行:"
-        head -3 /tmp/private.key
 
-        # 上传代码到微信小程序后台
-        # --robot 1 指定使用第一个上传密钥
+        # 上传代码到微信小程序后台，捕获完整输出和退出码
+        set +e
         miniprogram-ci upload \
           --appid "$WECHAT_APPID" \
           --privateKeyPath /tmp/private.key \
           --projectPath ./miniprogram \
           --robot 1 \
           --version "${{ github.run_number }}.${{ github.run_attempt }}" \
-          --desc "自动部署: ${{ github.event.head_commit.message }}"
+          --desc "自动部署" \
+          2>&1 | tee /tmp/upload.log
+        EXIT_CODE=${PIPESTATUS[0]}
+        set -e
+
+        echo "--- 上传结果 ---"
+        echo "退出码: $EXIT_CODE"
+        echo "完整日志:"
+        cat /tmp/upload.log
 
         # 删除临时密钥文件
-        rm /tmp/private.key
+        rm -f /tmp/private.key /tmp/upload.log
+
+        if [ $EXIT_CODE -ne 0 ]; then
+          echo "❌ 上传失败，退出码: $EXIT_CODE"
+          exit 1
+        else
+          echo "✅ 上传成功"
+        fi
       
     - name: 上传构建产物
       uses: actions/upload-artifact@v4
