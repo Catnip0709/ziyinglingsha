@@ -20,8 +20,6 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-        cache: 'npm'
-      # 如果项目没有 package.json，可以注释掉上面的 cache 配置
       
     # 如果有 npm 依赖需要安装，取消下面注释
     # - name: 安装依赖
