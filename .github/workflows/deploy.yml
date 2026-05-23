@@ -55,15 +55,34 @@ jobs:
       run: |
         # 创建临时密钥文件
         echo "$WECHAT_PRIVATE_KEY" > /tmp/private.key
-        
+
+        # 检查密钥文件是否为空
+        if [ ! -s /tmp/private.key ]; then
+          echo "❌ 错误: WECHAT_PRIVATE_KEY 为空，请检查 GitHub Secrets 配置"
+          exit 1
+        fi
+
+        # 检查 AppID 是否为空
+        if [ -z "$WECHAT_APPID" ]; then
+          echo "❌ 错误: WECHAT_APPID 为空，请检查 GitHub Secrets 配置"
+          exit 1
+        fi
+
+        echo "AppID: $WECHAT_APPID"
+        echo "密钥文件大小: $(wc -c < /tmp/private.key) bytes"
+        echo "密钥文件前3行:"
+        head -3 /tmp/private.key
+
         # 上传代码到微信小程序后台
+        # --robot 1 指定使用第一个上传密钥
         miniprogram-ci upload \
           --appid "$WECHAT_APPID" \
           --privateKeyPath /tmp/private.key \
           --projectPath ./miniprogram \
+          --robot 1 \
           --version "${{ github.run_number }}.${{ github.run_attempt }}" \
           --desc "自动部署: ${{ github.event.head_commit.message }}"
-        
+
         # 删除临时密钥文件
         rm /tmp/private.key
       
