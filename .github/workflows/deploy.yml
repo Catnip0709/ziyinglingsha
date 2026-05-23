@@ -1,114 +1,31 @@
-name: 微信小程序自动部署
+name: 自动部署微信小程序
 
 on:
   push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-  # 允许手动触发
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: 检出代码
-      uses: actions/checkout@v4
-      
-    - name: 设置 Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-      
-    # 如果有 npm 依赖需要安装，取消下面注释
-    # - name: 安装依赖
-    #   run: |
-    #     cd miniprogram
-    #     npm install
-      
-    # - name: 构建项目
-    #   run: |
-    #     cd miniprogram
-    #     npm run build
-      
-    - name: 检查项目结构
-      run: |
-        echo "项目文件结构:"
-        ls -la miniprogram/
-        echo ""
-        echo "pages 目录:"
-        ls -la miniprogram/pages/
-      
-    # 微信小程序 CI 上传
-    # 需要先在 GitHub Secrets 中配置以下变量：
-    # - WECHAT_APPID: 小程序 AppID
-    # - WECHAT_PRIVATE_KEY: 小程序上传密钥（从微信公众平台下载）
-    
-    - name: 安装微信小程序 CI 工具
-      run: npm install -g miniprogram-ci
-      
-    - name: 上传小程序代码
-      env:
-        WECHAT_APPID: ${{ secrets.WECHAT_APPID }}
-        WECHAT_PRIVATE_KEY: ${{ secrets.WECHAT_PRIVATE_KEY }}
-      run: |
-        # 创建临时密钥文件
-        echo "$WECHAT_PRIVATE_KEY" > /tmp/private.key
+      - name: 拉取代码
+        uses: actions/checkout@v4
 
-        # 检查密钥文件是否为空
-        if [ ! -s /tmp/private.key ]; then
-          echo "❌ 错误: WECHAT_PRIVATE_KEY 为空，请检查 GitHub Secrets 配置"
-          exit 1
-        fi
+      - name: 安装微信小程序CI工具
+        run: npm install -g miniprogram-ci
 
-        # 检查 AppID 是否为空
-        if [ -z "$WECHAT_APPID" ]; then
-          echo "❌ 错误: WECHAT_APPID 为空，请检查 GitHub Secrets 配置"
-          exit 1
-        fi
-
-        echo "AppID: $WECHAT_APPID"
-        echo "密钥文件大小: $(wc -c < /tmp/private.key) bytes"
-
-        # 上传代码到微信小程序后台，捕获完整输出和退出码
-        set +e
-        miniprogram-ci upload \
-          --appid "$WECHAT_APPID" \
-          --privateKeyPath /tmp/private.key \
-          --projectPath ./miniprogram \
-          --robot 1 \
-          --version "${{ github.run_number }}.${{ github.run_attempt }}" \
-          --desc "自动部署" \
-          2>&1 | tee /tmp/upload.log
-        EXIT_CODE=${PIPESTATUS[0]}
-        set -e
-
-        echo "--- 上传结果 ---"
-        echo "退出码: $EXIT_CODE"
-        echo "完整日志:"
-        cat /tmp/upload.log
-
-        # 删除临时密钥文件
-        rm -f /tmp/private.key /tmp/upload.log
-
-        if [ $EXIT_CODE -ne 0 ]; then
-          echo "❌ 上传失败，退出码: $EXIT_CODE"
-          exit 1
-        else
-          echo "✅ 上传成功"
-        fi
-      
-    - name: 上传构建产物
-      uses: actions/upload-artifact@v4
-      with:
-        name: miniprogram-build
-        path: |
-          miniprogram/
-        retention-days: 7
-        
-    - name: 部署成功通知
-      if: success()
-      run: |
-        echo "✅ 小程序代码已准备就绪"
-        echo "请在微信开发者工具中导入项目或等待自动上传完成"
+      - name: 上传微信小程序
+        run: |
+          miniprogram-ci upload \
+            --pp ./miniprogram \
+            --pkp <(echo "$WECHAT_PRIVATE_KEY") \
+            --appid $WECHAT_APPID \
+            --uv "${{ github.run_number }}.${{ github.run_attempt }}" \
+            --rn "自动发布" \
+            --enable-es6 true \
+            --enable-minify true
+        env:
+          WECHAT_APPID: ${{ secrets.WECHAT_APPID }}
+          WECHAT_PRIVATE_KEY: ${{ secrets.WECHAT_PRIVATE_KEY }}
