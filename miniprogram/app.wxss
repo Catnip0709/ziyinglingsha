@@ -1,0 +1,48 @@
+/**app.wxss**/
+page {
+  --primary-color: #1a1a2e;
+  --accent-color: #e94560;
+  --text-light: #ffffff;
+  --text-dark: #333333;
+  --bg-gradient-start: #1a1a2e;
+  --bg-gradient-end: #16213e;
+}
+
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 40rpx;
+  box-sizing: border-box;
+}
+
+/* 通用动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(60rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}

@@ -1,0 +1,15 @@
+<!--pages/official/official.wxml-->
+<view class="page-container">
+  <view class="page-header">
+    <text class="header-title">官方物料</text>
+    <text class="header-subtitle">官方资讯与物料汇总</text>
+  </view>
+  
+  <view class="content-area">
+    <view class="empty-state">
+      <text class="empty-icon">🎬</text>
+      <text class="empty-title">暂无官方物料</text>
+      <text class="empty-desc">后续将从腾讯云加载官方内容</text>
+    </view>
+  </view>
+</view>

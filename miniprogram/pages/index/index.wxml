@@ -1,0 +1,72 @@
+<!--pages/index/index.wxml-->
+<view class="home-container">
+  <!-- 背景图区域 -->
+  <view class="hero-section">
+    <image 
+      class="hero-bg" 
+      src="{{heroImageUrl}}" 
+      mode="aspectFill"
+      binderror="onImageError"
+    />
+    <view class="hero-overlay"></view>
+    <view class="hero-content">
+      <text class="hero-title">同人志</text>
+      <text class="hero-subtitle">记录每一份热爱</text>
+    </view>
+  </view>
+
+  <!-- 四个功能模块 -->
+  <view class="modules-container">
+    <view 
+      class="module-card {{animationStarted ? 'animate-in' : ''}}" 
+      style="animation-delay: 0.1s;"
+      bindtap="navigateTo"
+      data-page="story"
+    >
+      <view class="module-icon story-icon">
+        <text class="icon-text">📖</text>
+      </view>
+      <text class="module-title">故事记录</text>
+      <text class="module-desc">记录精彩剧情</text>
+    </view>
+
+    <view 
+      class="module-card {{animationStarted ? 'animate-in' : ''}}" 
+      style="animation-delay: 0.2s;"
+      bindtap="navigateTo"
+      data-page="official"
+    >
+      <view class="module-icon official-icon">
+        <text class="icon-text">🎬</text>
+      </view>
+      <text class="module-title">官方物料</text>
+      <text class="module-desc">官方资讯汇总</text>
+    </view>
+
+    <view 
+      class="module-card {{animationStarted ? 'animate-in' : ''}}" 
+      style="animation-delay: 0.3s;"
+      bindtap="navigateTo"
+      data-page="fanart"
+    >
+      <view class="module-icon fanart-icon">
+        <text class="icon-text">🎨</text>
+      </view>
+      <text class="module-title">同人创作</text>
+      <text class="module-desc">粉丝作品分享</text>
+    </view>
+
+    <view 
+      class="module-card {{animationStarted ? 'animate-in' : ''}}" 
+      style="animation-delay: 0.4s;"
+      bindtap="navigateTo"
+      data-page="aigc"
+    >
+      <view class="module-icon aigc-icon">
+        <text class="icon-text">🤖</text>
+      </view>
+      <text class="module-title">AIGC</text>
+      <text class="module-desc">AI创作内容</text>
+    </view>
+  </view>
+</view>

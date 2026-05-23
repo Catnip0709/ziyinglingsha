@@ -1,0 +1,17 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/story/story",
+    "pages/official/official",
+    "pages/fanart/fanart",
+    "pages/aigc/aigc"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#1a1a2e",
+    "navigationBarTitleText": "同人志",
+    "navigationBarTextStyle": "white"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

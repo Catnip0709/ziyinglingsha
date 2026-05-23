@@ -1,0 +1,43 @@
+name: 微信小程序预览版
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+      
+    - name: 安装微信小程序 CI 工具
+      run: npm install -g miniprogram-ci
+      
+    - name: 生成预览二维码
+      env:
+        WECHAT_APPID: ${{ secrets.WECHAT_APPID }}
+        WECHAT_PRIVATE_KEY: ${{ secrets.WECHAT_PRIVATE_KEY }}
+      run: |
+        # 创建临时密钥文件
+        echo "$WECHAT_PRIVATE_KEY" > /tmp/private.key
+        
+        # 生成预览二维码
+        miniprogram-ci preview \
+          --appid "$WECHAT_APPID" \
+          --privateKeyPath /tmp/private.key \
+          --projectPath ./miniprogram \
+          --qrcodeFormat image \
+          --qrcodeOutputPath /tmp/preview-qrcode.png
+        
+        # 删除临时密钥文件
+        rm /tmp/private.key
+        
+    - name: 上传预览二维码
+      uses: actions/upload-artifact@v4
+      with:
+        name: preview-qrcode
+        path: /tmp/preview-qrcode.png
+        retention-days: 1
